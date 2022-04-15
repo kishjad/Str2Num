@@ -1,2 +1,2 @@
-# C_string_2_num
+# Char2Num
 Safe conversions for C style string to numbers
