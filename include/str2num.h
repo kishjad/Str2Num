@@ -6,6 +6,9 @@
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <optional>
+#include <string>
+#include <type_traits>
 
 typedef enum {
     STR2NUM_SUCCESS,
@@ -14,18 +17,17 @@ typedef enum {
     STR2NUM_INCONVERTIBLE
 } str2num_errno;
 
-str2num_errno str2int(int *out, char *s, char* endptr, int base) {
-    char* end = endptr;
+str2num_errno str2int(int *out, const char *s, char* endptr, int base) {
     if (s[0] == '\0' || isspace((unsigned char) s[0]))
         return STR2NUM_INCONVERTIBLE;
     errno = 0;
-    long l = strtol(s, &end, base);
+    long l = strtol(s, &endptr, base);
     /* Both checks are needed because INT_MAX == LONG_MAX is possible. */
     if (l > INT_MAX || (errno == ERANGE && l == LONG_MAX))
         return STR2NUM_OVERFLOW;
     if (l < INT_MIN || (errno == ERANGE && l == LONG_MIN))
         return STR2NUM_UNDERFLOW;
-    if (*end != '\0')
+    if (*endptr != '\0')
         return STR2NUM_INCONVERTIBLE;
     *out = l;
     return STR2NUM_SUCCESS;
@@ -55,7 +57,7 @@ str2num_errno str2lglgint(long long int *out, char *s, char* endptr, int base) {
         return STR2NUM_INCONVERTIBLE;
     errno = 0;
     long long int l = strtoll(s, &end, base);
-    /* Both checks are needed because INT_MAX == LONG_MAX is possible. */
+    /* Both checks are needed because l == LONG_MAX or l == LLONG_MIN is possible. */
     if (errno == ERANGE && l == LLONG_MAX)
         return STR2NUM_OVERFLOW;
     else if (errno == ERANGE && l == LLONG_MIN)
