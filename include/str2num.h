@@ -6,9 +6,6 @@
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <optional>
-#include <string>
-#include <type_traits>
 
 typedef enum {
     STR2NUM_SUCCESS,
@@ -17,34 +14,33 @@ typedef enum {
     STR2NUM_INCONVERTIBLE
 } str2num_errno;
 
-str2num_errno str2int(int *out, const char *s, char* endptr, int base) {
+str2num_errno str2int(int *out, const char *s, char** endptr = nullptr, int base=10) {
     if (s[0] == '\0' || isspace((unsigned char) s[0]))
         return STR2NUM_INCONVERTIBLE;
     errno = 0;
-    long l = strtol(s, &endptr, base);
+    long l = strtol(s, endptr, base);
     /* Both checks are needed because INT_MAX == LONG_MAX is possible. */
     if (l > INT_MAX || (errno == ERANGE && l == LONG_MAX))
         return STR2NUM_OVERFLOW;
     if (l < INT_MIN || (errno == ERANGE && l == LONG_MIN))
         return STR2NUM_UNDERFLOW;
-    if (*endptr != '\0')
+    if (endptr!=nullptr && **endptr != '\0')
         return STR2NUM_INCONVERTIBLE;
     *out = l;
     return STR2NUM_SUCCESS;
 }
 
-str2num_errno str2uint(unsigned int *out, char *s, char* endptr, int base) {
-    char* end = endptr;
+str2num_errno str2uint(unsigned int *out, const char *s, char** endptr = nullptr, int base=10) {
     if (s[0] == '\0' || isspace((unsigned char) s[0]))
         return STR2NUM_INCONVERTIBLE;
     errno = 0;
-    unsigned long int l = strtoul(s, &end, base);
+    unsigned long int l = strtoul(s, endptr, base);
     /* Both checks are needed because INT_MAX == LONG_MAX is possible. */
     if (errno == ERANGE && l == ULONG_MAX)
         return STR2NUM_OVERFLOW;
     if (errno == ERANGE && l == 0)
         return STR2NUM_UNDERFLOW;
-    if (*end != '\0')
+    if (endptr!=nullptr && **endptr != '\0')
         return STR2NUM_INCONVERTIBLE;
     *out = l;
     return STR2NUM_SUCCESS;
