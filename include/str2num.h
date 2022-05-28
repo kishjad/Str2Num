@@ -46,6 +46,33 @@ str2num_errno str2uint(unsigned int *out, const char *s, char** endptr = nullptr
     return STR2NUM_SUCCESS;
 }
 
+str2num_errno str2long(long *out, const char *s, char** endptr = nullptr, int base=10) {
+    if (s[0] == '\0' || isspace((unsigned char) s[0]))
+        return STR2NUM_INCONVERTIBLE;
+    errno = 0;
+    long l = strtol(s, endptr, base);
+    if (errno == ERANGE && l == LONG_MAX)
+        return STR2NUM_OVERFLOW;
+    if (errno == ERANGE && l == LONG_MIN)
+        return STR2NUM_UNDERFLOW;
+    if (endptr!=nullptr && **endptr != '\0')
+        return STR2NUM_INCONVERTIBLE;
+    *out = l;
+    return STR2NUM_SUCCESS;
+}
+
+str2num_errno str2ulong(unsigned long *out, const char *s, char** endptr = nullptr, int base=10) {
+    if (s[0] == '\0' || isspace((unsigned char) s[0]))
+        return STR2NUM_INCONVERTIBLE;
+    errno = 0;
+    long l = strtoul(s, endptr, base);
+    if (errno == ERANGE && l == LONG_MAX)
+        return STR2NUM_OVERFLOW;
+    if ( (errno == ERANGE ) || (endptr!=nullptr && **endptr != '\0') )
+        return STR2NUM_INCONVERTIBLE;
+    *out = l;
+    return STR2NUM_SUCCESS;
+}
 
 str2num_errno str2lglgint(long long int *out, char *s, char* endptr, int base) {
     char *end = endptr;
