@@ -55,17 +55,17 @@ namespace s2n{
     }
 
     //stoll
-    std::optional<long long> safe_stoll( const std::string& str, std::size_t* pos = nullptr, int base = 10 ){
-        long long out;
-        char* endptr = nullptr;
-        if(str2ll(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
-            {   
-                if(pos != nullptr)
-                    *pos = endptr - str.c_str();
-                return out;
-            }
-        else return std::nullopt;
-    }
+    // std::optional<long long> safe_stoll( const std::string& str, std::size_t* pos = nullptr, int base = 10 ){
+    //     long long out;
+    //     char* endptr = nullptr;
+    //     if(str2ll(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
+    //         {   
+    //             if(pos != nullptr)
+    //                 *pos = endptr - str.c_str();
+    //             return out;
+    //         }
+    //     else return std::nullopt;
+    // }
 };
 
 #endif

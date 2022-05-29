@@ -74,42 +74,40 @@ str2num_errno str2ulong(unsigned long *out, const char *s, char** endptr = nullp
     return STR2NUM_SUCCESS;
 }
 
-str2num_errno str2lglgint(long long int *out, char *s, char* endptr, int base) {
-    char *end = endptr;
+str2num_errno str2lglgint(long long int *out, char *s, char** endptr = nullptr, int base) {
     if (s[0] == '\0' || isspace((unsigned char) s[0]))
         return STR2NUM_INCONVERTIBLE;
     errno = 0;
-    long long int l = strtoll(s, &end, base);
+    long long int l = strtoll(s, endptr, base);
     /* Both checks are needed because l == LONG_MAX or l == LLONG_MIN is possible. */
     if (errno == ERANGE && l == LLONG_MAX)
         return STR2NUM_OVERFLOW;
     else if (errno == ERANGE && l == LLONG_MIN)
         return STR2NUM_UNDERFLOW;
-    else if (*end != '\0')
+    else if (endptr!=nullptr && **endptr != '\0')
         return STR2NUM_INCONVERTIBLE;
     *out = l;
     return STR2NUM_SUCCESS;
 }
 
-str2num_errno str2lglguint(long long unsigned int *out, char *s, char* endptr, int base) {
-    char* end = endptr;
+str2num_errno str2lglguint(long long unsigned int *out, char *s, char** endptr = nullptr, int base) {
     if (s[0] == '\0' || isspace((unsigned char) s[0]))
         return STR2NUM_INCONVERTIBLE;
     errno = 0;
-    long long unsigned int l = strtoull(s, &end, base);
+    long long unsigned int l = strtoull(s, endptr, base);
     /* Both checks are needed because INT_MAX == LONG_MAX is possible. */
     if (errno == ERANGE && l == ULLONG_MAX)
         return STR2NUM_OVERFLOW;
     else if (errno == ERANGE && l == 0)
         return STR2NUM_UNDERFLOW;
-    else if (*end != '\0')
+    else if (endptr!=nullptr && **endptr != '\0')
         return STR2NUM_INCONVERTIBLE;
     *out = l;
     return STR2NUM_SUCCESS;
 }
 
 str2num_errno str2doub(double *out, char *s) {
-    if (s[0] == '\0' || isspace((unsigned char) s[0]))
+    if (s == nullptr || s[0] == '\0' || isspace((unsigned char) s[0]))
         return STR2NUM_INCONVERTIBLE;
     char *err;
     *out = strtod(s, &err);
@@ -122,7 +120,7 @@ str2num_errno str2doub(double *out, char *s) {
 }
 
 str2num_errno str2float(float *out, char *s) {
-    if (s[0] == '\0' || isspace((unsigned char) s[0]))
+    if (s == nullptr || s[0] == '\0' || isspace((unsigned char) s[0]))
         return STR2NUM_INCONVERTIBLE;
     char *err;
     *out = strtof(s, &err);
