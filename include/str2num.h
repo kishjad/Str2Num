@@ -81,8 +81,8 @@ str2num_errno str2int(int *out, const wchar_t *s) {
     return str2int(out, s, NULL, 10);
 }
 
-/*******************************************************************************/
 
+/*******************************************************************************/
 /*
     * Convert a string to an unsigned integer.
     *
@@ -173,6 +173,27 @@ str2num_errno str2l(long *out, const char *s, char** endptr ) {
 str2num_errno str2l(long *out, const char *s) {
     return str2l(out, s, NULL, 10);
 }
+str2num_errno str2l(long *out, const wchar_t *s, wchar_t** endptr , int base){
+    if (s == nullptr || s[0] == '\0' || iswspace(s[0]))
+        return STR2NUM_INCONVERTIBLE;
+    errno = 0;
+    long l = wcstol(s, endptr, base);
+    if (s2n_unlikely(errno == ERANGE && l == LONG_MAX))
+        return STR2NUM_OVERFLOW;
+    if (s2n_unlikely(errno == ERANGE && l == LONG_MIN))
+        return STR2NUM_UNDERFLOW;
+    if (s2n_unlikely(endptr!=nullptr && **endptr != '\0'))
+        return STR2NUM_INCONVERTIBLE;
+    *out = l;
+    return STR2NUM_SUCCESS;
+}
+str2num_errno str2l(long *out, const wchar_t *s, wchar_t** endptr ) {
+    return str2l(out, s, endptr, 10);
+}
+str2num_errno str2l(long *out, const wchar_t *s) {
+    return str2l(out, s, NULL, 10);
+}
+
 
 /*******************************************************************************/
 /*
@@ -206,6 +227,27 @@ str2num_errno str2ul(unsigned long *out, const char *s, char** endptr) {
 str2num_errno str2ul(unsigned long *out, const char *s) {
     return str2ul(out, s, NULL, 10);
 }
+str2num_errno str2ul(unsigned long *out, const wchar_t *s, wchar_t** endptr, int base){
+    if (s == nullptr || s[0] == '\0' || iswspace(s[0]))
+        return STR2NUM_INCONVERTIBLE;
+    errno = 0;
+    unsigned long l = wcstoul(s, endptr, base);
+    if (s2n_unlikely(errno == ERANGE && l == ULONG_MAX))
+        return STR2NUM_OVERFLOW;
+    if (s2n_unlikely(errno == ERANGE && l == 0))
+        return STR2NUM_UNDERFLOW;
+    if (s2n_unlikely(endptr!=nullptr && **endptr != '\0'))
+        return STR2NUM_INCONVERTIBLE;
+    *out = l;
+    return STR2NUM_SUCCESS;
+}
+str2num_errno str2ul(unsigned long *out, const wchar_t *s, wchar_t** endptr) {
+    return str2ul(out, s, endptr, 10);
+}
+str2num_errno str2ul(unsigned long *out, const wchar_t *s) {
+    return str2ul(out, s, NULL, 10);
+}
+
 
 /*******************************************************************************/
 /*
@@ -242,6 +284,27 @@ str2num_errno str2ll(long long int *out, const char *s, char** endptr) {
 str2num_errno str2ll(long long int *out, const char *s) {
     return str2ll(out, s, NULL, 10);
 }
+str2num_errno str2ll(long long int *out, const wchar_t *s, wchar_t** endptr, int base){
+    if (s == nullptr || s[0] == '\0' || iswspace(s[0]))
+        return STR2NUM_INCONVERTIBLE;
+    errno = 0;
+    long long int l = wcstoll(s, endptr, base);
+    if (s2n_unlikely(errno == ERANGE && l == LLONG_MAX))
+        return STR2NUM_OVERFLOW;
+    if (s2n_unlikely(errno == ERANGE && l == LLONG_MIN))
+        return STR2NUM_UNDERFLOW;
+    if (s2n_unlikely(endptr!=nullptr && **endptr != '\0'))
+        return STR2NUM_INCONVERTIBLE;
+    *out = l;
+    return STR2NUM_SUCCESS;
+}
+str2num_errno str2ll(long long int *out, const wchar_t *s, wchar_t** endptr) {
+    return str2ll(out, s, endptr, 10);
+}
+str2num_errno str2ll(long long int *out, const wchar_t *s) {
+    return str2ll(out, s, NULL, 10);
+}
+
 
 /*******************************************************************************/
 /*
@@ -278,6 +341,27 @@ str2num_errno str2ull(long long unsigned int *out, const char *s, char** endptr)
 str2num_errno str2ull(long long unsigned int *out, const char *s) {
     return str2ull(out, s, NULL, 10);
 }
+str2num_errno str2ull(long long unsigned int *out, const wchar_t *s, wchar_t** endptr = nullptr, int base = 10){
+    if (s == nullptr || s[0] == '\0' || iswspace(s[0]))
+        return STR2NUM_INCONVERTIBLE;
+    errno = 0;
+    long long unsigned int l = wcstoull(s, endptr, base);
+    if (s2n_unlikely(errno == ERANGE && l == ULLONG_MAX))
+        return STR2NUM_OVERFLOW;
+    if (s2n_unlikely(errno == ERANGE && l == 0))
+        return STR2NUM_UNDERFLOW;
+    if (s2n_unlikely(endptr!=nullptr && **endptr != '\0'))
+        return STR2NUM_INCONVERTIBLE;
+    *out = l;
+    return STR2NUM_SUCCESS;
+}
+str2num_errno str2ull(long long unsigned int *out, const wchar_t *s, wchar_t** endptr) {
+    return str2ull(out, s, endptr, 10);
+}
+str2num_errno str2ull(long long unsigned int *out, const wchar_t *s) {
+    return str2ull(out, s, NULL, 10);
+}
+
 
 /*******************************************************************************/
 /*
@@ -295,6 +379,15 @@ str2num_errno str2d(double *out, const char *s) {
     if (s2n_likely(*err == 0)) return STR2NUM_SUCCESS;
     else return STR2NUM_INCONVERTIBLE;
 }
+str2num_errno str2d(double *out, const wchar_t *s){
+    if (s == nullptr || s[0] == '\0' || iswspace(s[0]))
+        return STR2NUM_INCONVERTIBLE;
+    wchar_t *err;
+    *out = wcstod(s, &err);
+    if (s2n_likely(*err == 0)) return STR2NUM_SUCCESS;
+    else return STR2NUM_INCONVERTIBLE;
+}
+
 
 /*******************************************************************************/
 /*
@@ -312,6 +405,19 @@ str2num_errno str2f(float *out, const char *s) {
     if (s2n_likely(*err == 0) ) return STR2NUM_SUCCESS;
     else return STR2NUM_INCONVERTIBLE;
 }
+str2num_errno str2f(float *out, const wchar_t *s){
+    if (s == nullptr || s[0] == '\0' || iswspace(s[0]))
+        return STR2NUM_INCONVERTIBLE;
+    wchar_t *err;
+    *out = wcstof(s, &err);
+    if (s2n_likely(*err == 0)) return STR2NUM_SUCCESS;
+    else return STR2NUM_INCONVERTIBLE;
+}
+
+
+/*******************************************************************************/
+/*******************************************************************************/
+/*******************************************************************************/
 
 #ifdef __cplusplus
 #include <string>
@@ -344,6 +450,17 @@ namespace s2n{
             }
         else return std::nullopt;
     }
+    std::optional<int> safe_stoi( const std::wstring& str, std::size_t* pos = nullptr, int base = 10 ){
+        int out;
+        wchar_t* endptr = nullptr;
+        if(str2int(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
+            {   
+                if(pos != nullptr)
+                    *pos = endptr - str.c_str();
+                return out;
+            }
+        else return std::nullopt;
+    }
 
     /*
         * Convert a string to an unsigned integer.
@@ -358,6 +475,17 @@ namespace s2n{
     std::optional<long> safe_stol( const std::string& str, std::size_t* pos = nullptr, int base = 10 ){
         long out;
         char* endptr = nullptr;
+        if(str2l(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
+            {   
+                if(pos != nullptr)
+                    *pos = endptr - str.c_str();
+                return out;
+            }
+        else return std::nullopt;
+    }
+    std::optional<long> safe_stol( const std::wstring& str, std::size_t* pos = nullptr, int base = 10 ){
+        long out;
+        wchar_t* endptr = nullptr;
         if(str2l(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
             {   
                 if(pos != nullptr)
@@ -388,6 +516,17 @@ namespace s2n{
             }
         else return std::nullopt;
     }
+    std::optional<unsigned long> safe_stoul( const std::wstring& str, std::size_t* pos = nullptr, int base = 10 ){
+        unsigned long out;
+        wchar_t* endptr = nullptr;
+        if(str2ul(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
+            {   
+                if(pos != nullptr)
+                    *pos = endptr - str.c_str();
+                return out;
+            }
+        else return std::nullopt;
+    }
 
     /*
         * Convert a string to an unsigned integer.
@@ -402,6 +541,17 @@ namespace s2n{
     std::optional<long long> safe_stoll( const std::string& str, std::size_t* pos = nullptr, int base = 10 ){
         long long out;
         char* endptr = nullptr;
+        if(str2ll(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
+            {   
+                if(pos != nullptr)
+                    *pos = endptr - str.c_str();
+                return out;
+            }
+        else return std::nullopt;
+    }
+    std::optional<long long> safe_stoll( const std::wstring& str, std::size_t* pos = nullptr, int base = 10 ){
+        long long out;
+        wchar_t* endptr = nullptr;
         if(str2ll(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
             {   
                 if(pos != nullptr)
@@ -432,6 +582,17 @@ namespace s2n{
             }
         else return std::nullopt;
     }
+    std::optional<unsigned long long> safe_stoull( const std::wstring& str, std::size_t* pos = nullptr, int base = 10 ){
+        unsigned long long out;
+        wchar_t* endptr = nullptr;
+        if(str2ull(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
+            {   
+                if(pos != nullptr)
+                    *pos = endptr - str.c_str();
+                return out;
+            }
+        else return std::nullopt;
+    }
 
     /*
         * Convert a string to a double.
@@ -452,6 +613,16 @@ namespace s2n{
         }
         else return std::nullopt;
     }
+    std::optional<double> safe_stod( const std::wstring& str, std::size_t* pos = nullptr ){
+        double out;
+        if(str2d(&out, str.c_str()) == STR2NUM_SUCCESS)
+        {   
+            if(pos != nullptr)
+                *pos = str.size();
+            return out;
+        }
+        else return std::nullopt;
+    }
 
     /*
         * Convert a string to a float.
@@ -463,6 +634,16 @@ namespace s2n{
         * @return std::nullopt if the string is not valid or float.
     */
     std::optional<float> safe_stof( const std::string& str, std::size_t* pos = nullptr ){
+        float out;
+        if(str2f(&out, str.c_str()) == STR2NUM_SUCCESS)
+        {   
+            if(pos != nullptr)
+                *pos = str.size();
+            return out;
+        }
+        else return std::nullopt;
+    }
+    std::optional<float> safe_stof( const std::wstring& str, std::size_t* pos = nullptr ){
         float out;
         if(str2f(&out, str.c_str()) == STR2NUM_SUCCESS)
         {   
