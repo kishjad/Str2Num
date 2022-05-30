@@ -1,3 +1,5 @@
+#  SPDX-FileCopyrightText: 2022 Kish Jadhav
+#  SPDX-License-Identifier: MIT License
 cmake_minimum_required (VERSION 3.1)
 
 project (str2num VERSION 1.0 LANGUAGES CXX)
