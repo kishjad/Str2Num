@@ -1,3 +1,6 @@
+//  SPDX-FileCopyrightText: 2022 Kish Jadhav
+//  SPDX-License-Identifier: MIT License
+
 #ifndef STRCONVERT_H
 #define STRCONVERT_H
 
@@ -54,7 +57,7 @@ str2num_errno str2uint(unsigned int *out, const char *s, char** endptr = nullptr
     return STR2NUM_SUCCESS;
 }
 
-str2num_errno str2long(long *out, const char *s, char** endptr = nullptr, int base=10) {
+str2num_errno str2l(long *out, const char *s, char** endptr = nullptr, int base=10) {
     if (s == nullptr || s[0] == '\0' || isspace((unsigned char) s[0]))
         return STR2NUM_INCONVERTIBLE;
     errno = 0;
@@ -69,7 +72,7 @@ str2num_errno str2long(long *out, const char *s, char** endptr = nullptr, int ba
     return STR2NUM_SUCCESS;
 }
 
-str2num_errno str2ulong(unsigned long *out, const char *s, char** endptr = nullptr, int base=10) {
+str2num_errno str2ul(unsigned long *out, const char *s, char** endptr = nullptr, int base=10) {
     if (s == nullptr || s[0] == '\0' || isspace((unsigned char) s[0]))
         return STR2NUM_INCONVERTIBLE;
     errno = 0;
@@ -82,7 +85,7 @@ str2num_errno str2ulong(unsigned long *out, const char *s, char** endptr = nullp
     return STR2NUM_SUCCESS;
 }
 
-str2num_errno str2lglgint(long long int *out, char *s, char** endptr = nullptr, int base = 10) {
+str2num_errno str2ll(long long int *out, const char *s, char** endptr = nullptr, int base = 10) {
     if (s == nullptr || s[0] == '\0' || isspace((unsigned char) s[0]))
         return STR2NUM_INCONVERTIBLE;
     errno = 0;
@@ -98,7 +101,7 @@ str2num_errno str2lglgint(long long int *out, char *s, char** endptr = nullptr, 
     return STR2NUM_SUCCESS;
 }
 
-str2num_errno str2lglguint(long long unsigned int *out, char *s, char** endptr = nullptr, int base = 10) {
+str2num_errno str2ull(long long unsigned int *out, const char *s, char** endptr = nullptr, int base = 10) {
     if (s == nullptr || s[0] == '\0' || isspace((unsigned char) s[0]))
         return STR2NUM_INCONVERTIBLE;
     errno = 0;
@@ -114,7 +117,7 @@ str2num_errno str2lglguint(long long unsigned int *out, char *s, char** endptr =
     return STR2NUM_SUCCESS;
 }
 
-str2num_errno str2doub(double *out, const char *s) {
+str2num_errno str2d(double *out, const char *s) {
     if (s == nullptr || s[0] == '\0' || isspace((unsigned char) s[0]))
         return STR2NUM_INCONVERTIBLE;
     char *err;
@@ -123,7 +126,7 @@ str2num_errno str2doub(double *out, const char *s) {
     else return STR2NUM_INCONVERTIBLE;
 }
 
-str2num_errno str2float(float *out, const char *s) {
+str2num_errno str2f(float *out, const char *s) {
     if (s == nullptr || s[0] == '\0' || isspace((unsigned char) s[0]))
         return STR2NUM_INCONVERTIBLE;
     char *err;
@@ -131,6 +134,73 @@ str2num_errno str2float(float *out, const char *s) {
     if (s2n_likely(*err == 0) ) return STR2NUM_SUCCESS;
     else return STR2NUM_INCONVERTIBLE;
 }
+
+#ifdef __cplusplus
+#include <string>
+#include <optional>
+//Exception Free wrappers for the following
+/*
+stoi
+stol
+stoul
+stoll
+stoull
+*/
+
+namespace s2n{
+    //stoi
+    std::optional<int> safe_stoi( const std::string& str, std::size_t* pos = nullptr, int base = 10 ){
+        int out;
+        char* endptr = nullptr;
+        if(str2int(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
+            {   
+                if(pos != nullptr)
+                    *pos = endptr - str.c_str();
+                return out;
+            }
+        else return std::nullopt;
+    }
+
+    //stol
+    std::optional<long> safe_stol( const std::string& str, std::size_t* pos = nullptr, int base = 10 ){
+        long out;
+        char* endptr = nullptr;
+        if(str2l(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
+            {   
+                if(pos != nullptr)
+                    *pos = endptr - str.c_str();
+                return out;
+            }
+        else return std::nullopt;
+    }
+
+    //stoul
+    std::optional<unsigned long> safe_stoul( const std::string& str, std::size_t* pos = nullptr, int base = 10 ){
+        unsigned long out;
+        char* endptr = nullptr;
+        if(str2ul(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
+            {   
+                if(pos != nullptr)
+                    *pos = endptr - str.c_str();
+                return out;
+            }
+        else return std::nullopt;
+    }
+
+    //stoll
+    std::optional<long long> safe_stoll( const std::string& str, std::size_t* pos = nullptr, int base = 10 ){
+        long long out;
+        char* endptr = nullptr;
+        if(str2ll(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
+            {   
+                if(pos != nullptr)
+                    *pos = endptr - str.c_str();
+                return out;
+            }
+        else return std::nullopt;
+    }
+};
+#endif //__cplusplus
 
 #undef s2n_likely
 #undef s2n_unlikely

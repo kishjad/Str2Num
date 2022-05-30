@@ -1,4 +1,6 @@
-#include "str2num.hpp"
+//  SPDX-FileCopyrightText: 2022 Kish Jadhav
+//  SPDX-License-Identifier: MIT License
+#include "str2num.h"
 #include <iostream>
 #include <assert.h>
 
