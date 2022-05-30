@@ -423,6 +423,7 @@ str2num_errno str2f(float *out, const wchar_t *s){
 #include <string>
 #include <optional>
 #include <locale>
+#include <type_traits>
 //Exception Free wrappers for the following
 /*
 stoi,stol,stoul,stoll,stoull,stof,stod
@@ -439,20 +440,11 @@ namespace s2n{
         *
         *  @return std::nullopt if the string is not valid or integer.
     */
-    std::optional<int> safe_stoi( const std::string& str, std::size_t* pos = nullptr, int base = 10 ){
+    template<typename T, 
+        typename = typename std::enable_if<std::is_same<std::string, T>::value || std::is_same<std::wstring, T>::value>::type>
+    std::optional<int> safe_stoi( const T& str, std::size_t* pos = nullptr, int base = 10 ){
         int out;
         char* endptr = nullptr;
-        if(str2int(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
-            {   
-                if(pos != nullptr)
-                    *pos = endptr - str.c_str();
-                return out;
-            }
-        else return std::nullopt;
-    }
-    std::optional<int> safe_stoi( const std::wstring& str, std::size_t* pos = nullptr, int base = 10 ){
-        int out;
-        wchar_t* endptr = nullptr;
         if(str2int(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
             {   
                 if(pos != nullptr)
@@ -472,20 +464,11 @@ namespace s2n{
         *
         * @return std::nullopt if the string is not a valid unsigned integer or unsigned integer.
     */
-    std::optional<long> safe_stol( const std::string& str, std::size_t* pos = nullptr, int base = 10 ){
+    template<typename T, 
+        typename = typename std::enable_if<std::is_same<std::string, T>::value || std::is_same<std::wstring, T>::value>::type>
+    std::optional<long> safe_stol( const T& str, std::size_t* pos = nullptr, int base = 10 ){
         long out;
         char* endptr = nullptr;
-        if(str2l(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
-            {   
-                if(pos != nullptr)
-                    *pos = endptr - str.c_str();
-                return out;
-            }
-        else return std::nullopt;
-    }
-    std::optional<long> safe_stol( const std::wstring& str, std::size_t* pos = nullptr, int base = 10 ){
-        long out;
-        wchar_t* endptr = nullptr;
         if(str2l(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
             {   
                 if(pos != nullptr)
@@ -505,20 +488,11 @@ namespace s2n{
         *
         * @return std::nullopt if the string is not valid or unsigned long.
     */
-    std::optional<unsigned long> safe_stoul( const std::string& str, std::size_t* pos = nullptr, int base = 10 ){
+   template<typename T, 
+        typename = typename std::enable_if<std::is_same<std::string, T>::value || std::is_same<std::wstring, T>::value>::type>
+    std::optional<unsigned long> safe_stoul( const T& str, std::size_t* pos = nullptr, int base = 10 ){
         unsigned long out;
         char* endptr = nullptr;
-        if(str2ul(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
-            {   
-                if(pos != nullptr)
-                    *pos = endptr - str.c_str();
-                return out;
-            }
-        else return std::nullopt;
-    }
-    std::optional<unsigned long> safe_stoul( const std::wstring& str, std::size_t* pos = nullptr, int base = 10 ){
-        unsigned long out;
-        wchar_t* endptr = nullptr;
         if(str2ul(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
             {   
                 if(pos != nullptr)
@@ -538,20 +512,11 @@ namespace s2n{
         *
         * @return std::nullopt if the string is not valid or long long.
     */
-    std::optional<long long> safe_stoll( const std::string& str, std::size_t* pos = nullptr, int base = 10 ){
+    template<typename T, 
+        typename = typename std::enable_if<std::is_same<std::string, T>::value || std::is_same<std::wstring, T>::value>::type>
+    std::optional<long long> safe_stoll( const T& str, std::size_t* pos = nullptr, int base = 10 ){
         long long out;
         char* endptr = nullptr;
-        if(str2ll(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
-            {   
-                if(pos != nullptr)
-                    *pos = endptr - str.c_str();
-                return out;
-            }
-        else return std::nullopt;
-    }
-    std::optional<long long> safe_stoll( const std::wstring& str, std::size_t* pos = nullptr, int base = 10 ){
-        long long out;
-        wchar_t* endptr = nullptr;
         if(str2ll(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
             {   
                 if(pos != nullptr)
@@ -571,20 +536,11 @@ namespace s2n{
         *
         * @return std::nullopt if the string is not valid or unsigned long long.
     */
-    std::optional<unsigned long long> safe_stoull( const std::string& str, std::size_t* pos = nullptr, int base = 10 ){
+    template<typename T, 
+        typename = typename std::enable_if<std::is_same<std::string, T>::value || std::is_same<std::wstring, T>::value>::type>
+    std::optional<unsigned long long> safe_stoull( const T& str, std::size_t* pos = nullptr, int base = 10 ){
         unsigned long long out;
         char* endptr = nullptr;
-        if(str2ull(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
-            {   
-                if(pos != nullptr)
-                    *pos = endptr - str.c_str();
-                return out;
-            }
-        else return std::nullopt;
-    }
-    std::optional<unsigned long long> safe_stoull( const std::wstring& str, std::size_t* pos = nullptr, int base = 10 ){
-        unsigned long long out;
-        wchar_t* endptr = nullptr;
         if(str2ull(&out, str.c_str(), &endptr, base) == STR2NUM_SUCCESS)
             {   
                 if(pos != nullptr)
@@ -603,7 +559,9 @@ namespace s2n{
         *
         * @return std::nullopt if the string is not valid or double.
     */
-    std::optional<double> safe_stod( const std::string& str, std::size_t* pos = nullptr ){
+    template<typename T, 
+        typename = typename std::enable_if<std::is_same<std::string, T>::value || std::is_same<std::wstring, T>::value>::type>
+    std::optional<double> safe_stod( const T& str, std::size_t* pos = nullptr ){
         double out;
         if(str2d(&out, str.c_str()) == STR2NUM_SUCCESS)
         {   
@@ -633,17 +591,9 @@ namespace s2n{
         *
         * @return std::nullopt if the string is not valid or float.
     */
-    std::optional<float> safe_stof( const std::string& str, std::size_t* pos = nullptr ){
-        float out;
-        if(str2f(&out, str.c_str()) == STR2NUM_SUCCESS)
-        {   
-            if(pos != nullptr)
-                *pos = str.size();
-            return out;
-        }
-        else return std::nullopt;
-    }
-    std::optional<float> safe_stof( const std::wstring& str, std::size_t* pos = nullptr ){
+    template<typename T, 
+        typename = typename std::enable_if<std::is_same<std::string, T>::value || std::is_same<std::wstring, T>::value>::type>
+    std::optional<float> safe_stof( const T& str, std::size_t* pos = nullptr ){
         float out;
         if(str2f(&out, str.c_str()) == STR2NUM_SUCCESS)
         {   
