@@ -5,3 +5,6 @@
     <img src=https://img.shields.io/github/languages/code-size/kshitej/str2Num?color=purple>
 </p>
 Safe conversions for C/C++ style string to numbers
+
+## Functions
+//table of functions
