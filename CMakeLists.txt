@@ -10,4 +10,5 @@ set(STR2NUM_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include)
 
 message(STATUS ${CMAKE_BUILD_TYPE})
 include_directories(${STR2NUM_INCLUDE_DIRS})
+enable_testing()
 add_subdirectory(test)

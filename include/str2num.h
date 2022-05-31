@@ -9,6 +9,7 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <cwchar>
+#include <cwctype>
 
 #if (defined(__GNUC__) || defined(__clang__))
 #define s2n_likely(x)      __builtin_expect(!!(x), 1)
