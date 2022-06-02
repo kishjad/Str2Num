@@ -92,6 +92,6 @@ int main(){
     // TestINT();
     // TestUINT();
     testDouble();
-    // testFloat();
+    testFloat();
     return 0;
 }

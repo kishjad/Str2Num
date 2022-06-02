@@ -436,6 +436,9 @@ str2num_errno str2f(float *out, const char *s, char** endptr) {
     if(endptr != NULL) (*endptr = ptr);
     return STR2NUM_SUCCESS;
 }
+str2num_errno str2f(float * out, const char *s){
+    return str2f(out, s, NULL);
+}
 str2num_errno str2f(float *out, const wchar_t *s, wchar_t** endptr) {
     if (s == nullptr || s[0] == '\0' || iswspace(s[0]))
         return STR2NUM_INCONVERTIBLE;
@@ -451,6 +454,9 @@ str2num_errno str2f(float *out, const wchar_t *s, wchar_t** endptr) {
     *out = result;
     if(endptr != NULL) (*endptr = ptr);
     return STR2NUM_SUCCESS;
+}
+str2num_errno str2f(float * out, const wchar_t *s){
+    return str2f(out, s, NULL);
 }
 
 
