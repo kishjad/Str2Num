@@ -392,7 +392,7 @@ str2num_errno str2d(double *out, const char *s) {
     return str2d(out, s, NULL);
 }
 str2num_errno str2d(double *out, const wchar_t *s, wchar_t** endptr){
-    if (s == nullptr || s[0] == '\0' || iswspace((unsigned char) s[0]))
+    if (s == nullptr || s[0] == '\0' || iswspace(s[0]))
         return STR2NUM_INCONVERTIBLE;
     wchar_t* ptr = NULL;
     errno = 0;
@@ -420,21 +420,37 @@ str2num_errno str2d(double *out, const wchar_t *s) {
     * @param s The string to convert.
     * @return The error code.
 */
-str2num_errno str2f(float *out, const char *s) {
+str2num_errno str2f(float *out, const char *s, char** endptr) {
     if (s == nullptr || s[0] == '\0' || isspace((unsigned char) s[0]))
         return STR2NUM_INCONVERTIBLE;
-    char *err;
-    *out = strtof(s, &err);
-    if (s2n_likely(*err == 0) ) return STR2NUM_SUCCESS;
-    else return STR2NUM_INCONVERTIBLE;
+    char *ptr = NULL;
+    errno = 0;
+    float result = strtof(s, &ptr);
+    if (s2n_unlikely(errno == ERANGE && result >= HUGE_VALF))
+        return STR2NUM_OVERFLOW;
+    if (s2n_unlikely(errno == ERANGE && result <= -HUGE_VALF))
+        return STR2NUM_UNDERFLOW;
+    if (s2n_unlikely( (ptr!=nullptr && s == ptr) ))
+        return STR2NUM_INCONVERTIBLE;
+    *out = result;
+    if(endptr != NULL) (*endptr = ptr);
+    return STR2NUM_SUCCESS;
 }
-str2num_errno str2f(float *out, const wchar_t *s){
+str2num_errno str2f(float *out, const wchar_t *s, wchar_t** endptr) {
     if (s == nullptr || s[0] == '\0' || iswspace(s[0]))
         return STR2NUM_INCONVERTIBLE;
-    wchar_t *err;
-    *out = wcstof(s, &err);
-    if (s2n_likely(*err == 0)) return STR2NUM_SUCCESS;
-    else return STR2NUM_INCONVERTIBLE;
+    wchar_t *ptr = NULL;
+    errno = 0;
+    float result = wcstof(s, &ptr);
+    if (s2n_unlikely(errno == ERANGE && result >= HUGE_VALF))
+        return STR2NUM_OVERFLOW;
+    if (s2n_unlikely(errno == ERANGE && result <= -HUGE_VALF))
+        return STR2NUM_UNDERFLOW;
+    if (s2n_unlikely( (ptr!=nullptr && s == ptr) ))
+        return STR2NUM_INCONVERTIBLE;
+    *out = result;
+    if(endptr != NULL) (*endptr = ptr);
+    return STR2NUM_SUCCESS;
 }
 
 
