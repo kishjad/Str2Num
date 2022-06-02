@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <cwchar>
 #include <cwctype>
-
+#include <math.h>
 #if (defined(__GNUC__) || defined(__clang__))
 #define s2n_likely(x)      __builtin_expect(!!(x), 1)
 #define s2n_unlikely(x)    __builtin_expect(!!(x), 0)
@@ -372,21 +372,43 @@ str2num_errno str2ull(long long unsigned int *out, const wchar_t *s) {
     * @param s The string to convert.
     * @return The error code.
 */
-str2num_errno str2d(double *out, const char *s) {
+str2num_errno str2d(double *out, const char *s, char** endptr) {
     if (s == nullptr || s[0] == '\0' || isspace((unsigned char) s[0]))
         return STR2NUM_INCONVERTIBLE;
-    char *err;
-    *out = strtod(s, &err);
-    if (s2n_likely(*err == 0)) return STR2NUM_SUCCESS;
-    else return STR2NUM_INCONVERTIBLE;
-}
-str2num_errno str2d(double *out, const wchar_t *s){
-    if (s == nullptr || s[0] == '\0' || iswspace(s[0]))
+    char* ptr = NULL;
+    errno = 0;
+    double result = strtod(s, &ptr);
+    if (s2n_unlikely(errno == ERANGE && result >= HUGE_VAL))
+        return STR2NUM_OVERFLOW;
+    if (s2n_unlikely(errno == ERANGE && result <= -HUGE_VAL))
+        return STR2NUM_UNDERFLOW;
+    if (s2n_unlikely( (ptr!=nullptr && s == ptr) ))
         return STR2NUM_INCONVERTIBLE;
-    wchar_t *err;
-    *out = wcstod(s, &err);
-    if (s2n_likely(*err == 0)) return STR2NUM_SUCCESS;
-    else return STR2NUM_INCONVERTIBLE;
+    *out = result;
+    if(endptr != NULL) (*endptr = ptr);
+    return STR2NUM_SUCCESS;
+}
+str2num_errno str2d(double *out, const char *s) {
+    return str2d(out, s, NULL);
+}
+str2num_errno str2d(double *out, const wchar_t *s, wchar_t** endptr){
+    if (s == nullptr || s[0] == '\0' || iswspace((unsigned char) s[0]))
+        return STR2NUM_INCONVERTIBLE;
+    wchar_t* ptr = NULL;
+    errno = 0;
+    double result = wcstod(s, &ptr);
+    if (s2n_unlikely(errno == ERANGE && result >= HUGE_VAL))
+        return STR2NUM_OVERFLOW;
+    if (s2n_unlikely(errno == ERANGE && result <= -HUGE_VAL))
+        return STR2NUM_UNDERFLOW;
+    if (s2n_unlikely( (ptr!=nullptr && s == ptr) ))
+        return STR2NUM_INCONVERTIBLE;
+    *out = result;
+    if(endptr != NULL) (*endptr = ptr);
+    return STR2NUM_SUCCESS;
+}
+str2num_errno str2d(double *out, const wchar_t *s) {
+    return str2d(out, s, NULL);
 }
 
 
@@ -564,10 +586,11 @@ namespace s2n{
         typename = typename std::enable_if<std::is_same<std::string, T>::value || std::is_same<std::wstring, T>::value>::type>
     std::optional<double> safe_stod( const T& str, std::size_t* pos = nullptr ) noexcept {
         double out;
-        if(str2d(&out, str.c_str()) == STR2NUM_SUCCESS)
+        char* endptr = nullptr;
+        if(str2d(&out, str.c_str(), &endptr) == STR2NUM_SUCCESS)
         {   
             if(pos != nullptr)
-                *pos = str.size();
+                *pos = endptr - str.c_str();
             return out;
         }
         else return std::nullopt;

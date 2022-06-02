@@ -1,9 +1,9 @@
-#include "str2num.h"
 //  SPDX-FileCopyrightText: 2022 Kish Jadhav
 //  SPDX-License-Identifier: MIT License
+#include "str2num.h"
 #include <iostream>
 #include <assert.h>
-
+#include "test_floating.hpp"
 class TestINT{
     public:
     TestINT(){
@@ -89,7 +89,9 @@ class TestUINT{
 };
 
 int main(){
-    TestINT();
-    TestUINT();
+    // TestINT();
+    // TestUINT();
+    testDouble();
+    // testFloat();
     return 0;
 }
