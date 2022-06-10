@@ -8,6 +8,15 @@
 </p>
 Safe conversions for C/C++ style string to numbers
 
+## Why do I need this?
+C++ style string to number conversions throw exceptions.
+Take a look at the following example:
+```
+string s = "\t\r\n\f\v";   
+int i = stoi(s);
+Since the string is not a number, the stoi function throws an exception `invalid_argument`.
+```
+
 ## Functions
 | Function   | Supported Language | Description |
 | ----------- | ----------- | ----------- |
